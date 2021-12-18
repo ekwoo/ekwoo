@@ -19,34 +19,37 @@ const lineTool = (function(){
 			endX : 0,
 			endY : 0,
 	}
+	function onmousedown(e){
+		window.addEventListener('mousemove', onmousemove)
+		window.addEventListener('mouseup', onmouseup)
+		lineInfo.startX = canvas.getX(e.clientX)
+		lineInfo.startY = canvas.getY(e.clientY)
+	}
+	function onmousemove(e){
+		canvas.drawCtx.clearRect(Math.min(lineInfo.startX,lineInfo.endX)-10
+				,Math.min(lineInfo.startY,lineInfo.endY)-10
+				,Math.abs(lineInfo.startX-lineInfo.endX)+20
+				,Math.abs(lineInfo.startY-lineInfo.endY)+20)
+		lineInfo.endX = canvas.getX(e.clientX)
+		lineInfo.endY = canvas.getY(e.clientY)
+		canvas.drawCtx.beginPath()
+		canvas.drawCtx.moveTo(lineInfo.startX, lineInfo.startY)
+		canvas.drawCtx.lineTo(lineInfo.endX, lineInfo.endY)
+		canvas.drawCtx.closePath()
+		canvas.drawCtx.stroke()
+	}
+	function onmouseup(e){
+		canvas.drawCtx.clearRect(0, 0, canvas.drawEl.width, canvas.drawEl.height)
+		canvas.ctx.beginPath()
+		canvas.ctx.moveTo(lineInfo.startX, lineInfo.startY)
+		canvas.ctx.lineTo(canvas.getX(e.clientX), canvas.getY(e.clientY))
+		canvas.ctx.closePath()
+		canvas.ctx.stroke()
+		window.removeEventListener('mousemove', onmousemove)
+		window.removeEventListener('mouseup', onmouseup)
+	}
 	return {
-		onmousedown : function(e){
-			window.addEventListener('mousemove', this.onmousemove)
-			lineInfo.startX = canvas.getX(e.clientX)
-			lineInfo.startY = canvas.getY(e.clientY)
-		},
-		onmousemove : function(e){
-			canvas.drawCtx.clearRect(Math.min(lineInfo.startX,lineInfo.endX)-10
-					,Math.min(lineInfo.startY,lineInfo.endY)-10
-					,Math.abs(lineInfo.startX-lineInfo.endX)+20
-					,Math.abs(lineInfo.startY-lineInfo.endY)+20)
-			lineInfo.endX = canvas.getX(e.clientX)
-			lineInfo.endY = canvas.getY(e.clientY)
-			canvas.drawCtx.beginPath()
-			canvas.drawCtx.moveTo(lineInfo.startX, lineInfo.startY)
-			canvas.drawCtx.lineTo(lineInfo.endX, lineInfo.endY)
-			canvas.drawCtx.closePath()
-			canvas.drawCtx.stroke()
-		},
-		onmouseup : function(e){
-			canvas.drawCtx.clearRect(0, 0, canvas.drawEl.width, canvas.drawEl.height)
-			canvas.ctx.beginPath()
-			canvas.ctx.moveTo(lineInfo.startX, lineInfo.startY)
-			canvas.ctx.lineTo(canvas.getX(e.clientX), canvas.getY(e.clientY))
-			canvas.ctx.closePath()
-			canvas.ctx.stroke()
-			window.removeEventListener('mousemove', this.onmousemove)
-		},
+		onmousedown:onmousedown,
 	}
 })()
 function setLine(){

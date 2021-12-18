@@ -60,9 +60,6 @@ let tool = {
 		window.onmousedown = function(e){
 			tool.onmousedown(e)
 		}
-		window.onmouseup = function(e){
-			tool.onmouseup(e)
-		}
 		window.onresize = function(){
 			canvas.wrapEl.style.left = (canvas.fix.x =  -(canvas.el.width - window.innerWidth)/2)+"px"
 			canvas.wrapEl.style.top = (canvas.fix.y = -(canvas.el.height - window.innerHeight)/2)+"px"

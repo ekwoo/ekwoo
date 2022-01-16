@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="imecaret.preferences.ImeCaretPreferencePage"
+            id="imecaret.preferences.ImeCaretPreferencePage"
+            name="Custom Caret">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="imecaret.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+         <startup class="imecaret.startup.StartUp" />
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <Generic></Generic>
+   </extension>
+
+</plugin>

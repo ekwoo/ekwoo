@@ -4,8 +4,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorReference;
@@ -77,11 +75,11 @@ public class StartUp implements IStartup{
 	//activate caret change
 	public static void activate() {
 
-		//listen 한/영, insert
+		//create 한/영, insert listener & register
 		proc = new WindowProc();
 		proc.register();
 		
-		//listen Zoom
+		//create Zoom listener
 		fontPropertyChangeListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
@@ -93,10 +91,12 @@ public class StartUp implements IStartup{
 				}
 			}
 		};
+		JFaceResources.getFontRegistry().addListener(fontPropertyChangeListener);
 		
-		//listen Part activated
+		//create Part activation listener & register
 		partListener = new PartListener();
 		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService().addPartListener(partListener);
+
 		
 		//calc current activated part
 		StyledText styledText = StyledTextUtils.getCurrentStyledText();
@@ -155,20 +155,21 @@ public class StartUp implements IStartup{
 			if(styledText != null) {
 				StyledTextUtils.calcEditorImeCaret(styledText);
 			}
-			JFaceResources.getFontRegistry().addListener(fontPropertyChangeListener);
 		}
 		@Override
 		public void partVisible(IWorkbenchPartReference partReference) {}
 		@Override
-		public void partOpened(IWorkbenchPartReference partReference) {}
+		public void partOpened(IWorkbenchPartReference partReference) {
+			//remove & add Zoom Listener because AbstractTextEditor adds new Listener when it's opened
+			JFaceResources.getFontRegistry().removeListener(fontPropertyChangeListener);
+			JFaceResources.getFontRegistry().addListener(fontPropertyChangeListener);
+		}
 		@Override
 		public void partInputChanged(IWorkbenchPartReference partReference) {}
 		@Override
 		public void partHidden(IWorkbenchPartReference partReference) {}
 		@Override
-		public void partDeactivated(IWorkbenchPartReference partReference) {
-			JFaceResources.getFontRegistry().removeListener(fontPropertyChangeListener);
-		}
+		public void partDeactivated(IWorkbenchPartReference partReference) {}
 		@Override
 		public void partClosed(IWorkbenchPartReference partReference) {}
 		@Override

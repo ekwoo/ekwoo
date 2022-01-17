@@ -4,9 +4,6 @@ import java.lang.reflect.Constructor;
 
 import org.eclipse.swt.widgets.Caret;
 
-import imecaret.Activator;
-import imecaret.preferences.PreferenceConstants;
-
 
 public class CaretFactory {
 	public static Class caretClass;

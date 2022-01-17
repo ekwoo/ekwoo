@@ -1,7 +1,5 @@
 package imecaret.caret;
 
-import java.lang.reflect.Constructor;
-
 import org.eclipse.swt.widgets.Caret;
 
 /**

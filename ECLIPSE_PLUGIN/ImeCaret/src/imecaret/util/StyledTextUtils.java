@@ -12,13 +12,14 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
+import imecaret.caret.CaretFactory;
 import imecaret.caret.ImeCaret;
 import imecaret.caret.WideCaret;
 
 public class StyledTextUtils {
 	
 	/**
-	 * set StyledText Caret by IME mode
+	 * set StyledText's Caret by IME mode
 	 * @param styledText
 	 */
 	public static void calcEditorImeCaret(StyledText styledText) {
@@ -26,23 +27,34 @@ public class StyledTextUtils {
 	}
 
 	/**
-	 * set StyledText Caret by IME mode, Reverse
+	 * set StyledText's Caret by IME mode, Reverse
+	 * - 한/영 키 이벤트가 IME 변경보다 먼저 일어나서 반대로 동작하는 함수 생성.......
 	 * @param styledText
 	 */
 	public static void calcEditorImeCaretReverse(StyledText styledText, boolean reverse) {
 		Caret old = styledText.getCaret();
 		if(reverse != IMEUtils.isIME()) {
-			if(!(old instanceof ImeCaret)) {
-				styledText.setCaret(new WideCaret(old));
+			if(old.getClass() != CaretFactory.caretClass) {
+				if(old instanceof ImeCaret) {
+					Caret wrap = old;
+					old = ((ImeCaret)wrap).getOri();
+					wrap.dispose();
+				}
+				styledText.setCaret(CaretFactory.createCaret(old));
 			}
 		}else {
 			if(old instanceof ImeCaret) {
-				styledText.setCaret(((WideCaret) old).getOri());
+				styledText.setCaret(((ImeCaret) old).getOri());
 				old.dispose();
 			}
 		}
 	}
 	
+	/**
+	 * get StyledText from PartRefernce
+	 * @param partReference
+	 * @return
+	 */
 	public static StyledText getStyledTextFromPartRef(IWorkbenchPartReference partReference) {
 		if(partReference instanceof IEditorReference) {
 			IEditorPart editorPart = ((IEditorReference)partReference).getEditor(false);
@@ -57,6 +69,10 @@ public class StyledTextUtils {
 		return null;
 	}
 	
+	/**
+	 * get StyledText from Current Activated Part
+	 * @return
+	 */
 	public static StyledText getCurrentStyledText() {
 		IWorkbench wb = PlatformUI.getWorkbench();
 		if(wb != null) {

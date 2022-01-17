@@ -18,7 +18,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import imecaret.Activator;
+import imecaret.caret.CaretFactory;
 import imecaret.caret.ImeCaret;
+import imecaret.caret.WideCaret;
 import imecaret.preferences.PreferenceConstants;
 import imecaret.proc.WindowProc;
 import imecaret.util.StyledTextUtils;
@@ -30,23 +32,45 @@ public class StartUp implements IStartup{
 	
 	@Override
 	public void earlyStartup() {
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				if(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.USE_IME_CARET)) {
-					activate();
-				}
-				//listen property change
-				Activator.getDefault().getPreferenceStore().addPropertyChangeListener(e -> {
-					if(PreferenceConstants.USE_IME_CARET.equals(e.getProperty())) {
-						if(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.USE_IME_CARET)) {
-							StartUp.activate();
-						}else {
-							StartUp.deActivate();
+		Display.getDefault().asyncExec(() -> {
+			if(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.USE_IME_CARET)) {
+				activate();
+			}
+			try {
+				CaretFactory.caretClass = (Class<ImeCaret>) Class.forName(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.CARET_TYPE));
+			} catch (ClassNotFoundException e2) {
+				CaretFactory.caretClass = WideCaret.class;
+				e2.printStackTrace();
+			}
+			//listen property change
+			Activator.getDefault().getPreferenceStore().addPropertyChangeListener(e -> {
+				switch (e.getProperty()) {
+				case PreferenceConstants.USE_IME_CARET:
+					if(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.USE_IME_CARET)) {
+						StartUp.activate();
+					}else {
+						StartUp.deActivate();
+					}
+					break;
+				case PreferenceConstants.CARET_TYPE:
+					if(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.USE_IME_CARET)) {
+						try {
+							CaretFactory.caretClass = (Class<ImeCaret>) Class.forName(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.CARET_TYPE));
+							StyledText styledText = StyledTextUtils.getCurrentStyledText();
+							if(styledText != null) {
+								StyledTextUtils.calcEditorImeCaret(styledText);
+							}
+						} catch (ClassNotFoundException e1) {
+							System.out.println("Fail to get Caret Class ");
+							e1.printStackTrace();
 						}
 					}
-				});
-			}
+					break;
+
+				default:
+					break;
+				}
+			});
 		});
 	}
 	
@@ -69,7 +93,6 @@ public class StartUp implements IStartup{
 				}
 			}
 		};
-		JFaceResources.getFontRegistry().addListener(fontPropertyChangeListener);
 		
 		//listen Part activated
 		partListener = new PartListener();
@@ -132,6 +155,7 @@ public class StartUp implements IStartup{
 			if(styledText != null) {
 				StyledTextUtils.calcEditorImeCaret(styledText);
 			}
+			JFaceResources.getFontRegistry().addListener(fontPropertyChangeListener);
 		}
 		@Override
 		public void partVisible(IWorkbenchPartReference partReference) {}
@@ -142,7 +166,9 @@ public class StartUp implements IStartup{
 		@Override
 		public void partHidden(IWorkbenchPartReference partReference) {}
 		@Override
-		public void partDeactivated(IWorkbenchPartReference partReference) {}
+		public void partDeactivated(IWorkbenchPartReference partReference) {
+			JFaceResources.getFontRegistry().removeListener(fontPropertyChangeListener);
+		}
 		@Override
 		public void partClosed(IWorkbenchPartReference partReference) {}
 		@Override

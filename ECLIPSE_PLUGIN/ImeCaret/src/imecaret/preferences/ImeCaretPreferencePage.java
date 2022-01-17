@@ -1,12 +1,12 @@
 package imecaret.preferences;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.preference.*;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
+
 import imecaret.Activator;
-import imecaret.startup.StartUp;
 
 /**
  * CustomCaretPreferencePage
@@ -41,7 +41,7 @@ public class ImeCaretPreferencePage extends FieldEditorPreferencePage implements
 				PreferenceConstants.CARET_TYPE,
 				"IME Caret Type",
 				1,
-				new String[][] { { "&Wide", "wide" }, {"&Underline", "underline" }
+				new String[][] { { "&Wide", "imecaret.caret.WideCaret" }, {"&Underline", "imecaret.caret.UnderCaret" }
 		}, getFieldEditorParent());
 		addField(caretType);
 	}

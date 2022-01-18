@@ -19,9 +19,5 @@
          point="org.eclipse.ui.startup">
          <startup class="imecaret.startup.StartUp" />
    </extension>
-   <extension
-         point="org.eclipse.ui.bindings">
-      <Generic></Generic>
-   </extension>
 
 </plugin>

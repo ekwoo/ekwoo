@@ -30,6 +30,7 @@ public class StartUp implements IStartup{
 	
 	@Override
 	public void earlyStartup() {
+		//run after display is initialized
 		Display.getDefault().asyncExec(() -> {
 			if(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.USE_IME_CARET)) {
 				activate();

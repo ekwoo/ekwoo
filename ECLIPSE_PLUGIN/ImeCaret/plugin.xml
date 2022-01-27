@@ -6,7 +6,7 @@
       <page
             class="imecaret.preferences.ImeCaretPreferencePage"
             id="imecaret.preferences.ImeCaretPreferencePage"
-            name="Custom Caret">
+            name="IME Caret">
       </page>
    </extension>
    <extension

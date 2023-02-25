@@ -35,12 +35,6 @@ public class StartUp implements IStartup{
 			if(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.USE_IME_CARET)) {
 				activate();
 			}
-			try {
-				CaretFactory.caretClass = (Class<ImeCaret>) Class.forName(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.CARET_TYPE));
-			} catch (ClassNotFoundException e2) {
-				CaretFactory.caretClass = WideCaret.class;
-				e2.printStackTrace();
-			}
 			//listen property change
 			Activator.getDefault().getPreferenceStore().addPropertyChangeListener(e -> {
 				switch (e.getProperty()) {
@@ -52,16 +46,16 @@ public class StartUp implements IStartup{
 					}
 					break;
 				case PreferenceConstants.CARET_TYPE:
+					try {
+						CaretFactory.caretClass = (Class<ImeCaret>) Class.forName(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.CARET_TYPE));
+					} catch (ClassNotFoundException e1) {
+						System.out.println("Fail to get Caret Class ");
+						e1.printStackTrace();
+					}
 					if(Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.USE_IME_CARET)) {
-						try {
-							CaretFactory.caretClass = (Class<ImeCaret>) Class.forName(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.CARET_TYPE));
-							StyledText styledText = StyledTextUtils.getCurrentStyledText();
-							if(styledText != null) {
-								StyledTextUtils.calcEditorImeCaret(styledText);
-							}
-						} catch (ClassNotFoundException e1) {
-							System.out.println("Fail to get Caret Class ");
-							e1.printStackTrace();
+						StyledText styledText = StyledTextUtils.getCurrentStyledText();
+						if(styledText != null) {
+							StyledTextUtils.calcEditorImeCaret(styledText);
 						}
 					}
 					break;
@@ -75,7 +69,14 @@ public class StartUp implements IStartup{
 	
 	//activate caret change
 	public static void activate() {
-
+		//타입획득
+		try {
+			CaretFactory.caretClass = (Class<ImeCaret>) Class.forName(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.CARET_TYPE));
+			} catch (ClassNotFoundException e2) {
+			CaretFactory.caretClass = WideCaret.class;
+			e2.printStackTrace();
+		}
+		
 		//create 한/영, insert listener & register
 		proc = new WindowProc();
 		proc.register();
@@ -135,9 +136,11 @@ public class StartUp implements IStartup{
 				for(IWorkbenchPage page : window.getPages()) {
 					for(IEditorReference partReference: page.getEditorReferences()) {
 						StyledText styledText =  StyledTextUtils.getStyledTextFromPartRef(partReference);
-						Caret caret = styledText.getCaret();
-						if(caret instanceof ImeCaret) {
-							styledText.setCaret(((ImeCaret) caret).getOri());
+						if(styledText != null) {
+							Caret caret = styledText.getCaret();
+							if(caret instanceof ImeCaret) {
+								styledText.setCaret(((ImeCaret) caret).getOri());
+							}
 						}
 					}
 				}

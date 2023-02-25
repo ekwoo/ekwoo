@@ -1,14 +1,10 @@
 package imecaret.caret;
 
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Display;
-
-import imecaret.Activator;
 
 /**
  * Underline Caret

@@ -19,7 +19,7 @@ public class IMEUtils {
 	/**
 	 * This message is sent by an application to an IME window to obtain the current conversion mode. The window retrieves the current conversion mode from the current input context.
 	 * lParam Not Used
-	 * 윈도우 11의 새 IME를 사용하면 아래값을 사용한다.
+	 * 윈도우 11의 새 IME를 사용하면 아래값을 추가로 사용한다. 두 값이 전부 0이 아니어야 함
 	 */
 	public static final int IMC_GETCONVERSIONMODE = 1;
 	
@@ -33,9 +33,11 @@ public class IMEUtils {
 		//IME 윈도우 핸들 얻기
 		long hime = OS.ImmGetDefaultIMEWnd(hwnd);
 		//IME가 열려있는지 확인
-		long status = OS.SendMessage(hime, WM_IME_CONTROL, IMC_GETCONVERSIONMODE, 0);
-		//0이 아니면 IME OPEN
-		return status != 0;
+		long openStatus = OS.SendMessage(hime, WM_IME_CONTROL, IMC_GETOPENSTATUS, 0);
+		//IME가 Conversion Mode인지 확인
+		long conversionMode = OS.SendMessage(hime, WM_IME_CONTROL, IMC_GETCONVERSIONMODE, 0);
+		//둘 다 0이 아니면 IME OPEN
+		return openStatus != 0 && conversionMode != 0;
 	}
 	
 }
